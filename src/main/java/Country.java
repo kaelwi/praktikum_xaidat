@@ -16,9 +16,9 @@ public class Country {
         this.countryCode = countryCode;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.confirmed = confirmed;
-        this.dead = dead;
-        this.recovered = recovered;
+        this.confirmed = Math.max(confirmed, 0);
+        this.dead = Math.max(dead, 0);
+        this.recovered = Math.max(recovered, 0);
         this.updated = updated;
     }
 

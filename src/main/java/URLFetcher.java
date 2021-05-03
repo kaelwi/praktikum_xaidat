@@ -17,10 +17,8 @@ public class URLFetcher {
 
     private String getString() throws IOException {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
         con.setRequestMethod("GET");
         int status = con.getResponseCode();
-
         BufferedReader in = null;
 
         if (status > 299) {

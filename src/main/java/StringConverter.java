@@ -19,24 +19,29 @@ public class StringConverter {
     }
 
     public List<Country> convert() {
-        JsonObject jsonObject = new JsonParser().parse(content).getAsJsonObject();
-        JsonArray countries = jsonObject.getAsJsonArray("data");
+            JsonObject jsonObject = new JsonParser().parse(content).getAsJsonObject();
+            JsonArray countries = jsonObject.getAsJsonArray("data");
 
-        List<Country> countryList = new ArrayList<>();
+            List<Country> countryList = new ArrayList<>();
 
-        for (int i = 0; i < countries.size(); i++) {
-            JsonObject jobj = countries.get(i).getAsJsonObject();
-            String country = jobj.get("location").getAsString();
-            String countryCode = jobj.get("country_code").getAsString();
-            double latitude = jobj.get("latitude").getAsDouble();
-            double longitude = jobj.get("longitude").getAsDouble();
-            int confirmed = jobj.get("confirmed").getAsInt();
-            int dead = jobj.get("dead").getAsInt();
-            int recovered = jobj.get("recovered").getAsInt();
-            LocalDateTime updated = LocalDateTime.parse(jobj.get("updated").getAsString().substring(0, 19), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            countryList.add(new Country(country, countryCode, latitude, longitude, confirmed, dead, recovered, updated));
+            for (int i = 0; i < countries.size(); i++) {
+                try {
+                    JsonObject jobj = countries.get(i).getAsJsonObject();
+                    String country = jobj.get("location").getAsString();
+                    String countryCode = jobj.get("country_code").getAsString();
+                    double latitude = jobj.get("latitude").getAsDouble();
+                    double longitude = jobj.get("longitude").getAsDouble();
+                    int confirmed = jobj.get("confirmed").getAsInt();
+                    int dead = jobj.get("dead").getAsInt();
+                    int recovered = jobj.get("recovered").getAsInt();
+                    LocalDateTime updated = LocalDateTime.parse(jobj.get("updated").getAsString().substring(0, 19), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    countryList.add(new Country(country, countryCode, latitude, longitude, confirmed, dead, recovered, updated));
+                }
+                catch (NullPointerException e) {
+                    System.out.println("NullPointerException at position " + i);
+                }
         }
+            return countryList;
 
-        return countryList;
     }
 }
