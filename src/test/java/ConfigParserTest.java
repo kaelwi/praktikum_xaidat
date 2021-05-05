@@ -11,11 +11,27 @@ import java.nio.charset.StandardCharsets;
 public class ConfigParserTest {
 
     @Test
-    public void testInputParsing() throws IOException {
-        String input = "update_interval=1\ncountry_codes=zw, iq, no";
+    public void testGetInterval() throws IOException {
+        String input = "update_interval=100\ncountry_codes=zw, iq, no";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         ConfigParser cp = new ConfigParser(inputStream);
-        System.out.println(cp.getInterval());
-        System.out.println(cp.getCountries().toString());
+        Assertions.assertEquals(100, cp.getInterval());
+    }
+
+    @Test
+    public void testIntervalNull() throws IOException {
+        String input = "country_codes=zw, iq, no";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertEquals(1, cp.getInterval());
+    }
+
+    @Test
+    public void testEmptyInput() throws IOException {
+        String input = "";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertEquals(1, cp.getInterval());
+        Assertions.assertEquals(null, cp.getCountries());
     }
 }

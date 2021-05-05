@@ -10,15 +10,12 @@ import java.util.*;
 
 public class Main {
 
+    private static HashMap<String, Country> countrySent = new HashMap<>();
 
-        //config file(.properties file)
-        // interval
-        // country_filter
     public static void main(String[] args) throws IOException {
 
         ConfigParser cp = new ConfigParser(Main.class.getClassLoader().getResourceAsStream("config.properties"));
         URLFetcher urlFetcher = new URLFetcher(new URL("https://www.trackcorona.live/api/countries"));
-        HashMap<LocalDateTime, Country> countryWithTimeStamp = new HashMap<>();
 
         Timer t = new Timer();
         TimerTask task = new TimerTask() {
@@ -31,76 +28,22 @@ public class Main {
                 StringConverter stringConverter = new StringConverter(content);
                 List<Country> countriesWithJackson = stringConverter.convertWithJackson();
 
-                Set<String> countriesToCheck = new HashSet<>();
-                for (String code : cp.getCountries()) {
-                    countriesToCheck.add(code);
+                CountryMapper countryMapper = new CountryMapper();
+                HashMap<String, Country> countryMap;
+
+                if (cp.getCountries() != null) {
+                    countryMap = countryMapper.getFilteredCountries(cp.getCountries(), countriesWithJackson);
+                } else {
+                    countryMap = countryMapper.convertArrayList(countriesWithJackson);
                 }
 
-                HashMap<String, Country> countryMap = new HashMap<>();
-                for (Country c : countriesWithJackson) {
-                    countryMap.put(c.getCountryCode(), c);
-                }
-
-                Iterator<Map.Entry<String, Country>> it = countryMap.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<String, Country> entry = it.next();
-                    if(!countriesToCheck.contains(entry.getKey())) {
-                        it.remove();
-                    }
-                }
-
-                if (countryWithTimeStamp.isEmpty()) {
-                    for (Country c : countryMap.values()) {
-                        countryWithTimeStamp.put(c.getUpdated(), c);
-                    }
-                }
-
-                Iterator<Map.Entry<String, Country>> it2 = countryMap.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry<String, Country> entry = it2.next();
-                    if(!countryWithTimeStamp.containsKey(entry.getValue().getUpdated())) {
-                        it.remove();
-                    }
-
-                }
-
+                HashMap<String, Country> countryToSend = countryMapper.checkSent(countrySent, countryMap);
 
                 // send to caduceus
-                // save last sent to hashMap with TimeStamp -> beim nächsten durchlauf: if not empty, check
 
-                //config - welche länder
-
-                //duplikate ignorieren
-
-                //senden an caduceus
+                countrySent.putAll(countryToSend);
             }
         };
         t.scheduleAtFixedRate(task, 0,cp.getInterval()*60*1000);
-
-
-
-
-
-        // timer?
-
-
-
-
-/*        // daten fetchen von https://www.trackcorona.live/api/countries
-        //daten fetchen alle x sekunden
-        // URLFetcher urlFetcher = new URLFetcher(new URL("https://www.trackcorona.live/api/countries"));
-        String content = urlFetcher.fetch();
-
-        //convertieren in java objekte
-        StringConverter stringConverter = new StringConverter(content[0]);
-        List<Country> countryList = stringConverter.convert();
-        List<Country> countriesWithJackson = stringConverter.convertWithJackson();
-
-        //config - welche länder
-
-        //duplikate ignorieren
-
-        //senden an caduceus*/
-
     }
 }
