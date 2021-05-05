@@ -28,22 +28,19 @@ public class Main {
                 StringConverter stringConverter = new StringConverter(content);
                 List<Country> countriesWithJackson = stringConverter.convertWithJackson();
 
+                // get filtered countries
                 CountryMapper countryMapper = new CountryMapper();
-                HashMap<String, Country> countryMap;
+                HashMap<String, Country> countryMap = countryMapper.getCountries(cp, countriesWithJackson);
 
-                if (cp.getCountries() != null) {
-                    countryMap = countryMapper.getFilteredCountries(cp.getCountries(), countriesWithJackson);
-                } else {
-                    countryMap = countryMapper.convertArrayList(countriesWithJackson);
-                }
-
+                // remove already sent countries
                 HashMap<String, Country> countryToSend = countryMapper.checkSent(countrySent, countryMap);
 
                 // send to caduceus
 
+                // update list/map of sent countries
                 countrySent.putAll(countryToSend);
             }
         };
-        t.scheduleAtFixedRate(task, 0,cp.getInterval()*60*1000);
+        t.scheduleAtFixedRate(task, 0, (long) (cp.getInterval() *60*1000));
     }
 }

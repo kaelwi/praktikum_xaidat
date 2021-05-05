@@ -33,6 +33,4 @@ public class CountryTest {
         Country c = new Country("Iran", "ir", 32.427908, 53.688046, -1, 65680, 1749041, LocalDateTime.parse("2021-04-15 14:15:07", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         Assumptions.assumeFalse(c.getCountryCode().length() != 2, "Country code must consist of exactly 2 letters!");
     }
-
-
 }

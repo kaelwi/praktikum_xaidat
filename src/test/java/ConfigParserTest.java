@@ -1,17 +1,14 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
-import javax.validation.constraints.Null;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ConfigParserTest {
 
     @Test
-    public void testGetInterval() throws IOException {
+    public void testGetInterval() {
         String input = "update_interval=100\ncountry_codes=zw, iq, no";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         ConfigParser cp = new ConfigParser(inputStream);
@@ -19,7 +16,7 @@ public class ConfigParserTest {
     }
 
     @Test
-    public void testIntervalNull() throws IOException {
+    public void testIntervalNull() {
         String input = "country_codes=zw, iq, no";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         ConfigParser cp = new ConfigParser(inputStream);
@@ -27,11 +24,36 @@ public class ConfigParserTest {
     }
 
     @Test
-    public void testEmptyInput() throws IOException {
+    public void testEmptyInput() {
         String input = "";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         ConfigParser cp = new ConfigParser(inputStream);
         Assertions.assertEquals(1, cp.getInterval());
-        Assertions.assertEquals(null, cp.getCountries());
+        Assertions.assertNull(cp.getCountries());
+    }
+
+    @Test
+    public void testGetCountriesSplitter() {
+        String input = "country_codes=,,,zw, iq, , , ,,,no";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertEquals(3, cp.getCountries().size());
+    }
+
+    @Test
+    public void checkValidInterval() {
+        String input = "update_interval=100.01";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertEquals(100.01, cp.getInterval());
+    }
+
+    @Test
+    public void checkInvalidInterval() {
+        String input = "update_interval=100,01";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertNotEquals(100.01, cp.getInterval());
+        Assertions.assertEquals(1, cp.getInterval());
     }
 }

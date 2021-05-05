@@ -3,7 +3,7 @@ import java.util.*;
 
 public class CountryMapper {
 
-    public HashMap<String, Country> getFilteredCountries(ArrayList<String> filteredCountries, List<Country> allCountries) {
+    private HashMap<String, Country> getFilteredCountries(ArrayList<String> filteredCountries, List<Country> allCountries) {
         Set<String> countriesToCheck = new HashSet<>();
         for (String code : filteredCountries) {
             countriesToCheck.add(code);
@@ -37,15 +37,24 @@ public class CountryMapper {
         HashMap<String, Country> returnSet = new HashMap<>();
 
         if (countrySent.isEmpty()) {
-            return countryMap;
+            returnSet = countryMap;
         } else {
             for (String country : countryMap.keySet()) {
                 if (countryMap.get(country).getUpdated().isAfter(countrySent.get(country).getUpdated())) {
                     returnSet.put(country, countryMap.get(country));
                 }
             }
-
-            return returnSet;
         }
+        return returnSet;
+    }
+
+    public HashMap<String, Country> getCountries (ConfigParser cp, List<Country> countries) {
+        HashMap<String, Country> countryMap;
+        if (cp.getCountries() != null) {
+            countryMap = getFilteredCountries(cp.getCountries(), countries);
+        } else {
+            countryMap = convertArrayList(countries);
+        }
+        return countryMap;
     }
 }

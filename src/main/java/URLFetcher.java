@@ -39,7 +39,6 @@ public class URLFetcher {
                 // log.debug("Status {}", status);
             }
 
-
             String inputLine;
             StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
@@ -64,10 +63,8 @@ public class URLFetcher {
             try {
                 in.close();
             } catch (IOException e) {
-                // log.error(String.valueOf(e));
                 e.printStackTrace();
             }
         }
     }
-
 }
