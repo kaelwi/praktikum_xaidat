@@ -1,8 +1,12 @@
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Country {
     protected String location;
+    @JsonProperty("country_code")
     protected String countryCode;
     protected double latitude;
     protected double longitude;
@@ -10,6 +14,10 @@ public class Country {
     protected int dead;
     protected int recovered;
     protected LocalDateTime updated;
+
+
+    public Country() {
+    }
 
     public Country(String location, String countryCode, double latitude, double longitude, int confirmed, int dead, int recovered, LocalDateTime updated) {
         this.location = location;
@@ -21,6 +29,7 @@ public class Country {
         this.recovered = Math.max(recovered, 0);
         this.updated = updated;
     }
+
 
     public String getLocation() {
         return location;
@@ -53,6 +62,11 @@ public class Country {
     public LocalDateTime getUpdated() {
         return updated;
     }
+
+    public void setUpdated(String updated){
+        this.updated = LocalDateTime.parse(updated.substring(0, 19), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
 
     @Override
     public String toString() {

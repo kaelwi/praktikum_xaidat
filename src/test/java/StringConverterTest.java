@@ -79,6 +79,4 @@ public class StringConverterTest {
         Assertions.assertThrows(NullPointerException.class, sc::convert);
     }
 
-
-
 }
