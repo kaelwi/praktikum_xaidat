@@ -46,7 +46,7 @@ public class Main {
 
                     stmt.executeUpdate( "CREATE TABLE IF NOT EXISTS countries ( countryCode char(2) PRIMARY KEY," +
                             "location varchar(255), latitude decimal(9, 6), longitude decimal(10, 6), confirmed mediumint," +
-                            "dead mediumint, recovered mediumint, updated varchar(50))");
+                            "dead mediumint, recovered mediumint, updated varchar(50) )");
 
                     ResultSet rs = stmt.executeQuery("SELECT * FROM countries");
 
@@ -56,9 +56,25 @@ public class Main {
                         System.out.println("rs empty");
                         countryToSend.forEach((k, v)-> {
                             try {
-                                stmt.executeUpdate("INSERT INTO countries (countryCode, location, latitude, longitude, " +
+                                // parameterised statement
+                                // https://stackoverflow.com/questions/20781743/java-how-to-write-variable-into-h2-database
+
+                                PreparedStatement statement = con.prepareStatement("INSERT INTO countries (countryCode, location, latitude, longitude, " +
+                                                "confirmed, dead, recovered, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                                statement.setString(1, v.getCountryCode());
+                                statement.setString(2, v.getLocation());
+                                statement.setDouble(3, v.getLatitude());
+                                statement.setDouble(4, v.getLongitude());
+                                statement.setInt(5, v.getConfirmed());
+                                statement.setInt(6, v.getDead());
+                                statement.setInt(7, v.getRecovered());
+                                statement.setString(8, v.getUpdated().toString());
+
+                                statement.executeUpdate();
+
+                                /*stmt.executeUpdate("INSERT INTO countries (countryCode, location, latitude, longitude, " +
                                         "confirmed, dead, recovered, updated) VALUES (v.getCountryCode, v.getLocation, v.getLatitude, " +
-                                        "v.getLongitude, v.getConfirmed, v.getDead, v.getRecovered, v.getUpdated.toString()) ");
+                                        "v.getLongitude, v.getConfirmed, v.getDead, v.getRecovered, v.getUpdated.toString()) ");*/
                             } catch (SQLException throwables) {
                                 throwables.printStackTrace();
                             }
@@ -108,6 +124,7 @@ public class Main {
                 }
                 catch( Exception e )
                 {
+                    System.out.println("Catch");
                     System.out.println( e.getMessage() );
                 }
                 System.out.println("after db");
