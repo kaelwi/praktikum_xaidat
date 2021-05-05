@@ -21,8 +21,12 @@ public class CountryMapperTest {
         Country c2 = new Country("austria", "at", 111, 123, 1, 1, 1, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         map1.put(c1.getCountryCode(), c1);
         map2.put(c2.getCountryCode(), c2);
-
         Assumptions.assumeTrue(countryMapper.checkSent(map1, map2).isEmpty());
+
+        Country c3 = new Country("france", "fr", 111, 123, 1, 1, 1, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+        map2.put(c3.getCountryCode(), c3);
+        countryMapper.checkSent(map1, map2);
+
     }
 
     @Test

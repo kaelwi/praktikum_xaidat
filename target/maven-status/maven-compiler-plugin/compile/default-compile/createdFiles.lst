@@ -1,2 +1,10 @@
+Country.class
 Logger.class
+FileFetcher.class
+Main$1.class
 URLFetcher.class
+CountryMapper.class
+Main.class
+StringConverter.class
+ConfigParser.class
+IFetcher.class

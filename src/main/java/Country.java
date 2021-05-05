@@ -30,7 +30,6 @@ public class Country {
         this.updated = updated;
     }
 
-
     public String getLocation() {
         return location;
     }
@@ -63,10 +62,10 @@ public class Country {
         return updated;
     }
 
-    public void setUpdated(String updated){
+
+    public void setUpdated(String updated) {
         this.updated = LocalDateTime.parse(updated.substring(0, 19), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-
 
     @Override
     public String toString() {

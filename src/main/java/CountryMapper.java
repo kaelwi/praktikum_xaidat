@@ -1,13 +1,9 @@
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class CountryMapper {
 
-    private HashMap<String, Country> getFilteredCountries(ArrayList<String> filteredCountries, List<Country> allCountries) {
-        Set<String> countriesToCheck = new HashSet<>();
-        for (String code : filteredCountries) {
-            countriesToCheck.add(code);
-        }
+    private HashMap<String, Country> getFilteredCountries(List<String> filteredCountries, List<Country> allCountries) {
+        Set<String> countriesToCheck = new HashSet<>(filteredCountries);
 
         HashMap<String, Country> countryMap = new HashMap<>();
         for (Country c : allCountries) {
@@ -17,7 +13,7 @@ public class CountryMapper {
         Iterator<Map.Entry<String, Country>> it = countryMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Country> entry = it.next();
-            if(!countriesToCheck.contains(entry.getKey())) {
+            if (!countriesToCheck.contains(entry.getKey())) {
                 it.remove();
             }
         }
@@ -40,6 +36,9 @@ public class CountryMapper {
             returnSet = countryMap;
         } else {
             for (String country : countryMap.keySet()) {
+                if (!countrySent.containsKey(country)) {
+                    returnSet.put(country, countryMap.get(country));
+                }
                 if (countryMap.get(country).getUpdated().isAfter(countrySent.get(country).getUpdated())) {
                     returnSet.put(country, countryMap.get(country));
                 }
@@ -48,7 +47,7 @@ public class CountryMapper {
         return returnSet;
     }
 
-    public HashMap<String, Country> getCountries (ConfigParser cp, List<Country> countries) {
+    public HashMap<String, Country> getCountries(ConfigParser cp, List<Country> countries) {
         HashMap<String, Country> countryMap;
         if (cp.getCountries() != null) {
             countryMap = getFilteredCountries(cp.getCountries(), countries);

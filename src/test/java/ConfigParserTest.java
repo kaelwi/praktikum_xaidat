@@ -56,4 +56,13 @@ public class ConfigParserTest {
         Assertions.assertNotEquals(100.01, cp.getInterval());
         Assertions.assertEquals(1, cp.getInterval());
     }
+
+    @Test
+    public void checkNegativeInterval() {
+        String input = "update_interval=-1";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        ConfigParser cp = new ConfigParser(inputStream);
+        Assertions.assertNotEquals(100.01, cp.getInterval());
+        Assertions.assertEquals(1, cp.getInterval());
+    }
 }

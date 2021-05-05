@@ -1,5 +1,4 @@
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,10 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.*;
 
 @Slf4j
 public class ConfigParser {
-    private final Properties prop = new Properties();;
+    private final Properties prop = new Properties();
+    ;
 
     public ConfigParser(InputStream inputStream) {
         // prop = new Properties();
@@ -21,7 +23,6 @@ public class ConfigParser {
         } catch (IllegalArgumentException e) {
             log.error("Malformed Unicode escape in the input", e);
         }
-
     }
 
     public double getInterval() {
@@ -31,17 +32,18 @@ public class ConfigParser {
                 returnValue = Double.parseDouble(prop.getProperty("update_interval"));
             }
         } else {
-            log.debug("Interval can't be null! ");
-            log.debug("Interval set to smallest possible positive number (integer).");
+            log.debug("Interval can't be null or negative! ");
+            log.debug("Interval set to 1 minute.");
         }
         return returnValue;
     }
 
     private static boolean isNumeric(String str) {
-        return str != null && str.matches("[-+]?\\d*\\.?\\d+");
+        return str != null && str.matches("[+]?\\d*\\.?\\d+");
     }
 
-    public ArrayList<String> getCountries() {
+    public List<String> getCountries() {
+
         if (prop.getProperty("country_codes") != null) {
             String countries = prop.getProperty("country_codes");
             ArrayList<String> countryList = new ArrayList<>(Arrays.asList(countries.split("\\s*,\\s*")));
@@ -50,17 +52,17 @@ public class ConfigParser {
             log.debug("No filter found.");
             return null;
         }
-
     }
 
-    private ArrayList<String> removeEmpty(ArrayList<String> list) {
-        Iterator it = list.iterator();
-        while(it.hasNext()) {
-            String s = (String) it.next();
-            if(s.isEmpty()) {
-                it.remove();
-            }
-        }
-        return list;
+    private List<String> removeEmpty(ArrayList<String> list) {
+        return  list.stream()
+                .filter(this::filterNonEmpty)
+                .collect(Collectors.toList());
     }
+
+    private boolean filterNonEmpty(String e){
+            return !e.isEmpty();
+    }
+
+
 }

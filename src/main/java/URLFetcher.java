@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Slf4j
-public class URLFetcher {
+public class URLFetcher implements  IFetcher {
 
     private final URL url;
 
@@ -50,7 +50,7 @@ public class URLFetcher {
             e.printStackTrace();
         } finally {
             closeStream(in);
-            if(con != null) {
+            if (con != null) {
                 con.disconnect();
             }
         }
