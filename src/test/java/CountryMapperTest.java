@@ -10,13 +10,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CountryMapperTest {
     @Test
     public void testCheckSent() {
         CountryMapper countryMapper = new CountryMapper();
-        HashMap<String, Country> map1 = new HashMap<>();
-        HashMap<String, Country> map2 = new HashMap<>();
+        Map<String, Country> map1 = new HashMap<>();
+        Map<String, Country> map2 = new HashMap<>();
         Country c1 = new Country("austria", "at", 111, 123, 1, 1, 1, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         Country c2 = new Country("austria", "at", 111, 123, 1, 1, 1, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         map1.put(c1.getCountryCode(), c1);

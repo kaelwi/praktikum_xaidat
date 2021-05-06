@@ -7,15 +7,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
 import java.util.*;
+
 import com.xaidat.caduceus.Properties;
+
 public class Main {
 
-    private static HashMap<String, Country> countrySent = new HashMap<>();
+    // private static Map<String, Country> countrySent = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
 
         ConfigParser cp = new ConfigParser(Main.class.getClassLoader().getResourceAsStream("config.properties"));
-        IFetcher fetcher =  fetcher(args);
+        IFetcher fetcher = fetcher(args);
 
         Timer t = new Timer();
         TimerTask task = new TimerTask() {
@@ -30,106 +32,75 @@ public class Main {
 
                 // get filtered countries
                 CountryMapper countryMapper = new CountryMapper();
-                HashMap<String, Country> countryMap = countryMapper.getCountries(cp, countriesWithJackson);
+                Map<String, Country> countryMap = countryMapper.getCountries(cp, countriesWithJackson);
 
                 // remove already sent countries
-                HashMap<String, Country> countryToSend = countryMapper.checkSent(countrySent, countryMap);
+                // Map<String, Country> countryToSend = countryMapper.checkSent(countrySent, countryMap);
+                Map<String, Country> countriesToRemove = new HashMap<>();       // concurrentModificationException in iteration
 
-                try
-                {
+                ResultSet rs = DBManager.createTable();
+
+                if (!rs.next()) {
+                    DBManager.insertMap(DBManager.getConnection(), countryMap);
+                } else {
+                    countriesToRemove = DBManager.updateOrInsertMap(DBManager.getConnection(), countryMap);
+                }
+
+                rs.close();
+                DBManager.closeConnetcion();
+
+/*                try {
                     Class.forName("org.h2.Driver");
-                    Connection con = DriverManager.getConnection("jdbc:h2:~/test", "test", "" );
-                    // Connection con = DriverManager.getConnection("jdbc:h2:file:C:/Users/karol/Documents/xaidat/test", "test", "");
-                    System.out.println("connection");
+                    Connection con = DriverManager.getConnection("jdbc:h2:~/test", "test", "");
                     Statement stmt = con.createStatement();
-                    //stmt.executeUpdate( "DROP TABLE table1" );
+                    // stmt.executeUpdate( "DROP TABLE countries" );
 
-                    stmt.executeUpdate( "CREATE TABLE IF NOT EXISTS countries ( countryCode char(2) PRIMARY KEY," +
+                    stmt.executeUpdate("CREATE TABLE IF NOT EXISTS countries ( countryCode char(2) PRIMARY KEY," +
                             "location varchar(255), latitude decimal(9, 6), longitude decimal(10, 6), confirmed mediumint," +
-                            "dead mediumint, recovered mediumint, updated varchar(50) )");
+                            "dead mediumint, recovered mediumint, updated timestamp )");
 
                     ResultSet rs = stmt.executeQuery("SELECT * FROM countries");
 
-                    System.out.println("first select");
-
                     if (!rs.next()) {
-                        System.out.println("rs empty");
-                        countryToSend.forEach((k, v)-> {
+                        countryMap.forEach((k, v) -> {
                             try {
                                 // parameterised statement
                                 // https://stackoverflow.com/questions/20781743/java-how-to-write-variable-into-h2-database
-
-                                PreparedStatement statement = con.prepareStatement("INSERT INTO countries (countryCode, location, latitude, longitude, " +
-                                                "confirmed, dead, recovered, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                                statement.setString(1, v.getCountryCode());
-                                statement.setString(2, v.getLocation());
-                                statement.setDouble(3, v.getLatitude());
-                                statement.setDouble(4, v.getLongitude());
-                                statement.setInt(5, v.getConfirmed());
-                                statement.setInt(6, v.getDead());
-                                statement.setInt(7, v.getRecovered());
-                                statement.setString(8, v.getUpdated().toString());
-
-                                statement.executeUpdate();
-
-                                /*stmt.executeUpdate("INSERT INTO countries (countryCode, location, latitude, longitude, " +
-                                        "confirmed, dead, recovered, updated) VALUES (v.getCountryCode, v.getLocation, v.getLatitude, " +
-                                        "v.getLongitude, v.getConfirmed, v.getDead, v.getRecovered, v.getUpdated.toString()) ");*/
+                                insertSQL(con, v);
                             } catch (SQLException throwables) {
                                 throwables.printStackTrace();
                             }
                         });
                     } else {
-                        System.out.println("rs not empty");
-                        while(rs.next()) {
-                            String cCode = rs.getString("countryCode");
-                            if (countryToSend.containsKey(cCode) && countryToSend.get(cCode).getUpdated().toString().equals(rs.getString("updated"))) {
-                                System.out.println("already sent");
-                                countryToSend.remove(cCode);
-                            } else {
-                                if (!countryToSend.containsKey(cCode)) {
-                                    System.out.println("never sent");
-                                    stmt.executeUpdate("INSERT INTO countries (countryCode, location, latitude, longitude, " +
-                                            "confirmed, dead, recovered, updated) VALUES (countryToSend.get(cCode).getCountryCode, " +
-                                            "countryToSend.get(cCode).getLocation, countryToSend.get(cCode).getLatitude, " +
-                                            "countryToSend.get(cCode).getLongitude, countryToSend.get(cCode).getConfirmed, " +
-                                            "countryToSend.get(cCode).getDead, countryToSend.get(cCode).getRecovered, " +
-                                            "countryToSend.get(cCode).getUpdated.toString()) ");
+                        countryMap.forEach((k, v) -> {
+                            try {
+                                ResultSet compare = selectUpdatedSQL(con, v);
+
+                                if (!compare.next()) {
+                                    insertSQL(con, v);
                                 } else {
-                                    System.out.println("updated");
-                                    String newUpdated = countryToSend.get(cCode).getUpdated().toString();
-                                    stmt.executeUpdate("UPDATE countries SET updated = newUpdated WHERE countryCode = cCode");
+                                    if (Timestamp.valueOf(v.getUpdated()).toInstant().isAfter(compare.getTimestamp("updated").toInstant())) {
+                                        updateSQL(con, v);
+                                    } else {
+                                        countriesToRemove.put(k, v);
+                                    }
                                 }
+                            } catch (SQLException throwables) {
+                                throwables.printStackTrace();
                             }
-                        }
+                        });
                     }
-
-                    ResultSet resultSet = stmt.executeQuery("SELECT * FROM countries");
-                    while(resultSet.next()) {
-                        System.out.println(resultSet.getString("countryCode"));
-                    }
-
-                    stmt.executeUpdate( "CREATE TABLE table1 ( user varchar(50) )" );
-                    stmt.executeUpdate( "INSERT INTO table1 ( user ) VALUES ( 'Claudio' )" );
-                    stmt.executeUpdate( "INSERT INTO table1 ( user ) VALUES ( 'Bernasconi' )" );
-                    ResultSet rs2 = stmt.executeQuery("SELECT * FROM table1");
-                    while( rs2.next() )
-                    {
-                        String name = rs2.getString("user");
-                        System.out.println( name );
-                    }
-
                     stmt.close();
                     con.close();
-                }
-                catch( Exception e )
-                {
-                    System.out.println("Catch");
-                    System.out.println( e.getMessage() );
-                }
-                System.out.println("after db");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }*/
 
-                // send to caduceus
+                countryMap.keySet().removeAll(countriesToRemove.keySet());
+
+                // send to caduceus COUNTRYMAP
+
+                // sendToCaduceus(countryMap);
 
                 //
                 /**
@@ -156,10 +127,38 @@ public class Main {
                     Caduceus.requireAgent().notify("COVID","covid data "+v.getCountryCode(), Tags.of(v.getCountryCode()),p);
                 });*/
                 // update list/map of sent countries
-                countrySent.putAll(countryToSend);
+                // countrySent.putAll(countryMap);
             }
         };
         t.scheduleAtFixedRate(task, 0, (long) (cp.getInterval() * 60 * 1000));
+    }
+
+    private static void sendToCaduceus(Map<String, Country> countryMap) {
+        /**
+         * Send notification to Caduceus Server.
+         *
+         * @param category   The category of the notification.
+         * @param subject    The subject that describes the content of the event.
+         * @param body       The event's body containing all details of the event.
+         * @param tags       An arbitrary number of tags.
+         * @param properties An arbitrary number of properties associated with the event.
+         */
+        if (!countryMap.isEmpty()) {
+            countryMap.forEach((k, v) -> {
+                Map<String, String> props = new HashMap<>();
+                props.put("countryCode", v.getCountryCode());
+                props.put("latitude", String.valueOf(v.getLatitude()));
+                props.put("longitude", String.valueOf(v.getLongitude()));
+                props.put("confirmed", String.valueOf(v.getConfirmed()));
+                props.put("dead", String.valueOf(v.getDead()));
+                props.put("location", v.getLocation());
+                props.put("recovered", String.valueOf(v.getRecovered()));
+                props.put("updated", v.getUpdated().toString());
+                Properties p = Properties.of(props);
+
+                Caduceus.requireAgent().notify("COVID", "covid data " + v.getCountryCode(), Tags.of(v.getCountryCode()), p);
+            });
+        }
     }
 
     private static IFetcher fetcher(String[] args) {
@@ -169,7 +168,35 @@ public class Main {
         try {
             return new URLFetcher(new URL("https://www.trackcorona.live/api/countries"));
         } catch (MalformedURLException e) {
-            throw  new RuntimeException(e);
+            throw new RuntimeException(e);
         }
+    }
+
+    private static void insertSQL(Connection con, Country c) throws SQLException {
+        PreparedStatement statement = con.prepareStatement("INSERT INTO countries (countryCode, location, latitude, longitude, " +
+                "confirmed, dead, recovered, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        statement.setString(1, c.getCountryCode());
+        statement.setString(2, c.getLocation());
+        statement.setDouble(3, c.getLatitude());
+        statement.setDouble(4, c.getLongitude());
+        statement.setInt(5, c.getConfirmed());
+        statement.setInt(6, c.getDead());
+        statement.setInt(7, c.getRecovered());
+        statement.setTimestamp(8, Timestamp.valueOf(c.getUpdated()));
+
+        statement.executeUpdate();
+    }
+
+    private static void updateSQL(Connection con, Country c) throws SQLException {
+        PreparedStatement update = con.prepareStatement("UPDATE countries SET updated = ? WHERE countryCode = ?");
+        update.setTimestamp(1, Timestamp.valueOf(c.getUpdated()));
+        update.setString(2, c.getCountryCode());
+        update.executeUpdate();
+    }
+
+    private static ResultSet selectUpdatedSQL(Connection con, Country c) throws SQLException {
+        PreparedStatement preparedStatement = con.prepareStatement("SELECT updated FROM countries WHERE countryCode = ?");
+        preparedStatement.setString(1, c.getCountryCode());
+        return preparedStatement.executeQuery();
     }
 }
