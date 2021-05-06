@@ -2,6 +2,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -12,7 +14,6 @@ import java.util.*;
 @Slf4j
 public class ConfigParser {
     private final Properties prop = new Properties();
-    ;
 
     public ConfigParser(InputStream inputStream) {
         // prop = new Properties();
@@ -40,6 +41,25 @@ public class ConfigParser {
 
     private static boolean isNumeric(String str) {
         return str != null && str.matches("[+]?\\d*\\.?\\d+");
+    }
+
+    public URL getURL() throws MalformedURLException {
+        if (prop.getProperty("covid_url") != null) {
+            String url = prop.getProperty("covid_url");
+            return new URL(url);
+        } else {
+            log.debug("No URL found!");
+            return null;
+        }
+    }
+
+    public String getDBLocation() {
+        if (prop.getProperty("db_jdbc_url") != null) {
+            return prop.getProperty("db_jdbc_url");
+        } else {
+            log.debug("Invalid DB location.");
+            return null;
+        }
     }
 
     public List<String> getCountries() {
