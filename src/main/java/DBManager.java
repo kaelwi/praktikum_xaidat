@@ -10,6 +10,13 @@ public class DBManager {
         this.dbLocation = dbLocation;
     }
 
+    /**
+     * Establish connecton to database. DB location is set as an attribut (retrieved from config file)
+     *
+     * @return con (Connection)
+     * @throws ClassNotFoundException
+     * @throws SQLException
+     */
     public Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName("org.h2.Driver");
         // Connection con = DriverManager.getConnection("jdbc:h2:~/test", "test", "");
@@ -21,6 +28,13 @@ public class DBManager {
         con.close();
     }
 
+    /**
+     * Create table if not exists. Return result from select statement.
+     *
+     * @return rs (ResultSet from select statement)
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public ResultSet createTable() throws SQLException, ClassNotFoundException {
         Statement stmt = getConnection().createStatement();
         // stmt.executeUpdate( "DROP TABLE countries" );
@@ -31,6 +45,12 @@ public class DBManager {
         return rs;
     }
 
+    /**
+     * Method to insert all countries given through the parameter into the table.
+     *
+     * @param con (Connection)
+     * @param countryMap (Map<String, Country> of countries to be inserted)
+     */
     public void insertMap(Connection con, Map<String, Country> countryMap) {
         countryMap.forEach((k, v) -> {
             try {
@@ -43,6 +63,14 @@ public class DBManager {
         });
     }
 
+    /**
+     * Given a countryMap, update a table or insert values into a table. If there is an entry in the map which does
+     * not lead to an update or insert statement, put this entry in a separate map (countriesToRemove).
+     *
+     * @param con (Connection)
+     * @param countryMap (Map<String, Country> of countries to be inserted or updated if necessary)
+     * @return countriesToRemove (Map<String, Country> of countries that were not updated or inserted)
+     */
     public Map<String, Country> updateOrInsertMap(Connection con, Map<String, Country> countryMap) {
         Map<String, Country> countriesToRemove = new HashMap<>();
         countryMap.forEach((k, v) -> {

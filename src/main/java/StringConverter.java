@@ -58,6 +58,12 @@ public class StringConverter {
 
     }
 
+    /**
+     * Method to convert content fetched from URL to Java Objects (Country).
+     *
+     * @return countryList (List<Country> of countries retrieved from the URL/String content)
+     * @throws IOException
+     */
     public List<Country> convertWithJackson() throws IOException {
 
         JsonObject jsonObject = new JsonParser().parse(content).getAsJsonObject();

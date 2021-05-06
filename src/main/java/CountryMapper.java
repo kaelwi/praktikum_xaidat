@@ -15,6 +15,12 @@ public class CountryMapper {
         return countryMap;
     }
 
+    /**
+     * Simple method to convert List to Map
+     *
+     * @param countries (List<Country>)
+     * @return countryMap (Map<String, Country>)
+     */
     public Map<String, Country> convertArrayList(List<Country> countries) {
         Map<String, Country> countryMap = new HashMap<>();
         for (Country c : countries) {
@@ -23,6 +29,13 @@ public class CountryMapper {
         return countryMap;
     }
 
+    /**
+     * Method used originally to check if data has already been sent. Data was stored in an attribute of Main (and reseted with every new run)
+     *
+     * @param countrySent (Map<String, Country> of already sent data)
+     * @param countryMap (Map<String, Country> of data to be send)
+     * @return returnSet (Map<String, Country> actual countries that shall be sent)
+     */
     public Map<String, Country> checkSent(Map<String, Country> countrySent, Map<String, Country> countryMap) {
         Map<String, Country> returnSet = new HashMap<>();
 
@@ -41,6 +54,13 @@ public class CountryMapper {
         return returnSet;
     }
 
+    /**
+     * If there is a filter set in the config file, return filtered countries. Otherwise return all countries.
+     *
+     * @param cp (ConfigParser with properties)
+     * @param countries (List<Country> of all fetched country)
+     * @return countryMap (Map<String, Country> of countries to be sent)
+     */
     public Map<String, Country> getCountries(ConfigParser cp, List<Country> countries) {
         Map<String, Country> countryMap;
         if (cp.getCountries() != null) {

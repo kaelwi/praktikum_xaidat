@@ -4,8 +4,6 @@ import lombok.SneakyThrows;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.*;
 import java.util.*;
 
@@ -14,10 +12,10 @@ import com.xaidat.caduceus.Properties;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-            if(args.length < 1){
-                System.err.println("usage: <path_to_config_file>");
-                System.exit(1);
-            }
+        if (args.length < 1) {
+            System.err.println("usage: <path_to_config_file>");
+            System.exit(1);
+        }
 
         ConfigParser cp = new ConfigParser(new FileInputStream(args[0]) );
         // IFetcher fetcher = new URLFetcher(new URL("https://www.trackcorona.live/api/countries"));
@@ -43,6 +41,7 @@ public class Main {
 
                 DBManager dbManager = new DBManager(cp.getDBLocation());
 
+                // iterate over db and check if data has already been sent
                 ResultSet rs = dbManager.createTable();
                 if (!rs.next()) {
                     dbManager.insertMap(dbManager.getConnection(), countryMap);
@@ -89,6 +88,4 @@ public class Main {
             });
         }
     }
-
-
 }

@@ -26,6 +26,11 @@ public class ConfigParser {
         }
     }
 
+    /**
+     * Get interval given in config file (in minutes)
+     *
+     * @return double interval in minutes
+     */
     public double getInterval() {
         double returnValue = 1;
         if (prop.getProperty("update_interval") != null) {
@@ -43,6 +48,12 @@ public class ConfigParser {
         return str != null && str.matches("[+]?\\d*\\.?\\d+");
     }
 
+    /**
+     * Get URL (where data shall be fetched) from config file
+     *
+     * @return URL to data
+     * @throws MalformedURLException
+     */
     public URL getURL() throws MalformedURLException {
         if (prop.getProperty("covid_url") != null) {
             String url = prop.getProperty("covid_url");
@@ -53,6 +64,11 @@ public class ConfigParser {
         }
     }
 
+    /**
+     * Get location of the database from config file
+     *
+     * @return String location to DB
+     */
     public String getDBLocation() {
         if (prop.getProperty("db_jdbc_url") != null) {
             return prop.getProperty("db_jdbc_url");
@@ -62,6 +78,11 @@ public class ConfigParser {
         }
     }
 
+    /**
+     * Get list of countries which data shall be fetched (filter) from config file
+     *
+     * @return List<String> of country codes.
+     */
     public List<String> getCountries() {
 
         if (prop.getProperty("country_codes") != null) {

@@ -16,6 +16,11 @@ public class URLFetcher implements  IFetcher {
         this.url = url;
     }
 
+    /**
+     * Get data from URL as String
+     *
+     * @return getString() of fetched data
+     */
     public String fetch() {
         return getString();
     }
