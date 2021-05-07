@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -8,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 public class ConfigParserTest {
 
     @Test
-    public void testGetInterval() {
+    public void givenValidIntervalConfig_whenConfigIsParsed_intervalIsCorrect() {
         String input = "update_interval=100\ncountry_codes=zw, iq, no";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         ConfigParser cp = new ConfigParser(inputStream);

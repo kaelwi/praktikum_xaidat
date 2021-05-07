@@ -1,6 +1,6 @@
 /**
  * Main part of the application, combining all other elements together and creating a Caduceus event.
- *
+ * <p>
  * Last modified: 07.05.2021
  * Author: Karoline Elisabeth Wild
  */
@@ -24,7 +24,7 @@ public class Main {
             System.exit(1);
         }
 
-        ConfigParser cp = new ConfigParser(new FileInputStream(args[0]) );
+        ConfigParser cp = new ConfigParser(new FileInputStream(args[0]));
         // IFetcher fetcher = new URLFetcher(new URL("https://www.trackcorona.live/api/countries"));
         IFetcher fetcher = new URLFetcher(cp.getURL());
 
@@ -34,38 +34,45 @@ public class Main {
             @Override
             public void run() {
                 String content = fetcher.fetch();
-
-                //convertieren in java objekte
-                StringConverter stringConverter = new StringConverter(content);
-                List<Country> countriesWithJackson = stringConverter.convertWithJackson();
-
-                // get filtered countries
-                CountryMapper countryMapper = new CountryMapper();
-                Map<String, Country> countryMap = countryMapper.getCountries(cp, countriesWithJackson);
-
-                // remove already sent countries
-                Map<String, Country> countriesToRemove = new HashMap<>();       // concurrentModificationException in iteration
-
-                DBManager dbManager = new DBManager(cp.getDBLocation());
-
-                // iterate over db and check if data has already been sent
-                ResultSet rs = dbManager.createTable();
-                if (!rs.next()) {
-                    dbManager.insertMap(dbManager.getConnection(), countryMap);
-                } else {
-                    countriesToRemove = dbManager.updateOrInsertMap(dbManager.getConnection(), countryMap);
-                }
-
-                rs.close();
-                dbManager.closeConnection(dbManager.getConnection());
-
-                countryMap.keySet().removeAll(countriesToRemove.keySet());
-
-                // send to caduceus COUNTRYMAP
+                List<Country> countryList = convertIntoCountries(content);
+                Map<String, Country> countryMap = filter(cp, countryList);
+                removeDuplicates(cp, countryMap);
                 sendToCaduceus(countryMap);
             }
         };
         t.scheduleAtFixedRate(task, 0, (long) (cp.getInterval() * 60 * 1000));
+    }
+
+    @SneakyThrows
+    static List<Country> convertIntoCountries(String content) {
+        StringConverter stringConverter = new StringConverter(content);
+        return stringConverter.convertWithJackson();
+    }
+
+    static Map<String, Country> filter(ConfigParser cp, List<Country> countries) {
+        CountryMapper countryMapper = new CountryMapper();
+        return countryMapper.getCountries(cp, countries);
+    }
+
+    static void removeDuplicates(ConfigParser cp, Map<String, Country> countryMap) {
+        try {
+            // remove already sent countries
+            Map<String, Country> countriesToRemove = new HashMap<>();
+            DBManager dbManager = new DBManager(cp.getDBLocation());
+            // iterate over db and check if data has already been sent
+            ResultSet resultSet = dbManager.createTable();
+            if (!resultSet.next()) {
+                dbManager.insertMap(dbManager.getConnection(), countryMap);
+            } else {
+                countriesToRemove = dbManager.updateOrInsertMap(dbManager.getConnection(), countryMap);
+            }
+            resultSet.close();
+            dbManager.closeConnection(dbManager.getConnection());
+
+            countryMap.keySet().removeAll(countriesToRemove.keySet());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void sendToCaduceus(Map<String, Country> countryMap) {
