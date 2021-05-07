@@ -1,5 +1,5 @@
 /**
- * Main
+ * Main part of the application, combining all other elements together and creating a Caduceus event.
  *
  * Last modified: 07.05.2021
  * Author: Karoline Elisabeth Wild
