@@ -1,4 +1,4 @@
-# Praktikum at Xaidat GmbH
+# Internship at Xaidat GmbH
 Coding Task: Speak to some API to get data, create a Caduceus event, send it to a server instance.
 Caduceus Task: Build dashboards with those data, calculate some KPIs and display them as widgets.
 
