@@ -1,3 +1,13 @@
+/**
+ * A ConfigParser to parse the config and retrieve all necessary information. The config file includes
+ * information about the interval (in which the fetching of data should be repeated), a country filter (in case
+ * the user wants to get data for only some countries), the location of the database and the URL (where to
+ * fetch the data).
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -6,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.*;

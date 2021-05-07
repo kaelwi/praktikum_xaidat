@@ -1,3 +1,10 @@
+/**
+ * String Converter to convert fetched data (fetching returns a String) into a list of countries/objects.
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

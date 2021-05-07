@@ -1,4 +1,12 @@
-import javax.xml.transform.Result;
+/**
+ * DB Manager for handling operations related to the database. This manager includes not only the basic
+ * SQL statements, but it also checks, if data has already been sent via the check if it already has been
+ * updated/inserted in the database.
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;

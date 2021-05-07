@@ -1,3 +1,10 @@
+/**
+ * The URL Fetcher class fetches the data from an URL and returns it as a String.
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;

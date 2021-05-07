@@ -1,6 +1,12 @@
+/**
+ * Country class to map the fetched data on Java Objects.
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;

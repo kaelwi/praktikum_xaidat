@@ -1,3 +1,11 @@
+/**
+ * Country Mapper to get necessary countries from the fetched data using the country filter given in the
+ * config file.
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import java.util.*;
 
 public class CountryMapper {

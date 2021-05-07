@@ -1,3 +1,10 @@
+/**
+ * Main
+ *
+ * Last modified: 07.05.2021
+ * Author: Karoline Elisabeth Wild
+ */
+
 import com.xaidat.caduceus.Caduceus;
 import com.xaidat.caduceus.Tags;
 import lombok.SneakyThrows;
