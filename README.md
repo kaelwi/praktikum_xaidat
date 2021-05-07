@@ -5,7 +5,7 @@ Caduceus Task: Build dashboards with those data, calculate some KPIs and display
 ## Coding
 All backed with some testing.
 
-Usage: Don't forget to give the program the path to your config file as an argument.
+**Usage:** Don't forget to give the program the path to your config file as an argument.
 The config file has to have an URL and a path to your database. The intervall and filter are optional (interval is set to 1 minute by default, without a filter all fetched data is being processed).
 In IntelliJ: Run - Edit Configurations - CLI arguments to your application (in my case ./src/main/resources/config.properties)
 
